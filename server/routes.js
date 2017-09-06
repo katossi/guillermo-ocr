@@ -5,7 +5,7 @@
 var tesseract = require('node-tesseract');
 var multer  = require('multer');
 var fs = require('fs');
-var mrzTools = require('mrz');
+var mrz = require('mrz');
 
 module.exports = function(app) {
     app.use(multer(
@@ -53,23 +53,27 @@ var process = function(req, res) {
                     res.json(500, "Error while scanning image");
                 }
                 console.log('successfully deleted %s', path);
+                
             });
 
             //Muestra texto escaneado
-            //console.log(text);
-
-            var lineas = text.match(/^[0-9a-zA-Z<]{30}((\r\n|\n|\r)|$)/gm);
             
-            console.log("lineas");
-
+            console.log("Texto escaneado:" +text);
+            
+            lineas = text.match(/^[0-9a-zA-Z<]{30}((\r\n|\n|\r)|$)/gm);
+            
+            if (lineas === null){
+                res.json(200, "Not a ID")
+            }
+            
+            else{
+            console.log(lineas);
             var cadenaFinal = lineas.join("").trim();
-                
-                        
             console.log(cadenaFinal);
-          
-            console.log(mrzTools.parse(cadenaFinal));
+            console.log(mrz.parse(cadenaFinal));
             
-            res.json(200, mrzTools.parse(cadenaFinal));
+            res.json(200, mrz.parse(cadenaFinal));
+            }
         }
     });
 };
